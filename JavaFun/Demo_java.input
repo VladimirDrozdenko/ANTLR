@@ -1,0 +1,50 @@
+/***
+ * Excerpted from "The Definitive ANTLR 4 Reference",
+ * published by The Pragmatic Bookshelf.
+ * Copyrights apply to this code. It may not be used to create training material, 
+ * courses, books, articles, and the like. Contact us if you are in doubt.
+ * We make no guarantees that this code is fit for any purpose. 
+ * Visit http://www.pragmaticprogrammer.com/titles/tpantlr2 for more book information.
+***/
+import java.util.List;
+import java.util.Map;
+
+
+public class Demo {
+	void f(int x, String y) { }
+	int[ ] g(/*no args*/) { return null; }
+	List<Map<String, Integer>>[] h() { return null; }
+}
+
+
+public class ExtractInterfaceListener extends JavaBaseListener {
+
+    JavaParser parser;
+
+    public ExtractInterfaceListener(final JavaParser parser) {
+        this.parser = parser;
+    }
+
+    @Override
+    public void enterClassDeclaration(final JavaParser.ClassDeclarationContext ctx) {
+        System.out.println("interface I" + ctx.Identifier() + " {");
+    }
+
+    @Override
+    public void exitClassDeclaration(final JavaParser.ClassDeclarationContext ctx) {
+        System.out.println("}");
+    }
+
+    @Override
+    public void enterMethodDeclaration(final JavaParser.MethodDeclarationContext ctx) {
+        TokenStream tokens = parser.getTokenStream();
+        String type = "void";
+        if (ctx.type() != null) {
+            type = tokens.getText(ctx.type());
+        }
+
+        String args = tokens.getText(ctx.formalParameters());
+        System.out.println("\t" + type + " " + ctx.Identifier() + args + ";");
+    }
+}
+
